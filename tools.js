@@ -15,7 +15,7 @@ module.exports = {
 		var file = params.file;
 		var outFile = params.outputDir + path.basename(file, path.extname(file)) + '.css';
 
-		options = {
+		options = eyeglass({
 			file: file,
 			outFile: path.resolve(outFile),
 
@@ -25,26 +25,30 @@ module.exports = {
 			//sourceMapEmbed: false,
 			//omitSourceMapUrl: false,
 			outputStyle: params.outputStyle,
-		};
 
-		options.eyeglass = {
-			buildDir: params.outputDir,
+			eyeglass: {
+				engines: {
+	        sass: nodesass
+	      },
 
-			assets: {
-				httpPrefix: params.outputDir,
+				buildDir: params.outputDir,
 
-				sources: [
-					{
-						directory: path.dirname(path.dirname(file)),
-						globOpts: {
-							ignore: ["**/*.js", "**/*.scss"]
+				assets: {
+					httpPrefix: params.outputDir,
+
+					sources: [
+						{
+							directory: path.dirname(path.dirname(file)),
+							globOpts: {
+								ignore: ["**/*.js", "**/*.scss"]
+							}
 						}
-					}
-				]
+					]
+				}
 			}
-		};
+		});
 
-		nodesass.render(eyeglass(options, nodesass), function(error, result){
+		nodesass.render(options, function(error, result){
 
 			if (error) {
 				console.log(color.red('ERROR found in ') + color.red.bold(error.file) + color.red(' on line '+error.line) + color.red(': '+error.message));
